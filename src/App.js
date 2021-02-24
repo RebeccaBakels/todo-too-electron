@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useState, createContext} from 'react'
+import { BrowserRouter as Router, Switch, Route }from "react-router-dom";
+import firebase from 'firebase'
+import { Layout } from 'antd'
+import ToDoNavBar from './components/common/ToDoNavBar'
+import Home from './scenes/Home'
+import LogIn from './scenes/LogIn'
+import SignUp from './scenes/SignUp'
+import './App.css'
+import Fern from './assets/fern.png'
+import {firebaseConfig} from './config'
+const {Content, Footer} = Layout
+
+firebase.initializeApp(firebaseConfig)
+const firebaseAuth = firebase.auth()
+export const UserContext = createContext(null)
+
 
 function App() {
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <UserContext.Provider value={{user, setUser, firebaseAuth}}>
+      <Router>
+      <Layout className="layout">
+        <ToDoNavBar/>
+      <Content style={{ padding: '0 50px' }}>
+        <div className="site-layout-content">
+          <Switch>
+            <Route path="/LogIn" component={LogIn}/>
+            <Route path="/SignUp" component={SignUp}/>
+            <Route path="/" component={Home}/>
+        </Switch>
+        </div>
+      </Content>
+      <Footer style={{ textAlign: 'center' }}>©2021 Created by Becca Bakels</Footer>
+      <img src={Fern} alt='leaves'/>
+    </Layout>
+    </Router>
+    </UserContext.Provider>
+  )
 }
 
-export default App;
+export default App
